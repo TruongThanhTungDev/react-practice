@@ -1,7 +1,9 @@
 import { AppBar, Box, Button, Chip, FormControl, makeStyles, MenuItem, Select, Toolbar, Typography } from '@material-ui/core'
 import { ChangeEvent, useEffect, useState, useContext } from "react";
+import { AuthContext } from '../contexts/AuthContext';
 import { ProgressContext } from '../contexts/ProgressContext';
 import { ThemeContext } from '../contexts/ThemeContext';
+import Login from './Login';
 import WelcomeMessage from './WelcomeMessage'
 
 
@@ -27,6 +29,9 @@ const Navbar = () => {
   }>) => setPosition(event.target.value as string)
 
   const [time, setTime] = useState<Date>(() => new Date(Date.now()))
+
+  const [loginOpen, setLoginOpen] = useState(false)
+
   // effect
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date(Date.now())), 1000)
@@ -35,7 +40,8 @@ const Navbar = () => {
 
   // context
   const { lastTime, status } = useContext(ProgressContext)
-  const {theme} = useContext(ThemeContext)
+  const { theme } = useContext(ThemeContext)
+  const {authInfo: {isAuthenticated}, toggleAuth} = useContext(AuthContext) 
   return (
     <AppBar position="static" color={theme}>
       <Toolbar>
@@ -69,9 +75,15 @@ const Navbar = () => {
           <Box textAlign="center">
             <Box my={1}>
               <Typography variant="h6">{time.toUTCString()}</Typography>
-              <Button variant="contained">Login</Button>
+              <Button
+                variant="contained"
+                onClick={isAuthenticated ? toggleAuth.bind(this,'') : setLoginOpen.bind(this, true)}
+              >
+                {isAuthenticated ? "Logout" : "Login"}
+              </Button>
             </Box>
           </Box>
+          <Login isOpen={loginOpen} handleClose={setLoginOpen} />
         </div>
       </Toolbar>
     </AppBar>
